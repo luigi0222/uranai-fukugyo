@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>無料スピリチュアル診断｜生年月日で魂の設計図を読む</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            mystic: { 50:'#f5eeff', 100:'#eddeff', 500:'#9b59b6', 700:'#6d28d9', 900:'#2d0b5c' },
+            gold: { DEFAULT:'#c9a84c', light:'#e8c96a' }
+          },
+          fontFamily: { serif: ['"Hiragino Mincho ProN"','"Yu Mincho"','Georgia','serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: radial-gradient(ellipse at 50% 0%, #3b0764 0%, #0d0020 60%); }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8) sepia(1) hue-rotate(240deg); }
+    .star-bg { background-image: radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.25) 0%, transparent 100%); }
+    .gender-btn.active { background: rgba(201,168,76,0.15); border-color: #c9a84c; color: #c9a84c; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.7s ease forwards; }
+    .fade-up-2 { animation: fadeUp 0.7s 0.15s ease both; }
+    .fade-up-3 { animation: fadeUp 0.7s 0.3s ease both; }
+    .glow-btn { box-shadow: 0 0 30px rgba(124,58,237,0.5); }
+    .glow-btn:hover { box-shadow: 0 0 50px rgba(124,58,237,0.7); }
+  </style>
+</head>
+<body class="font-serif text-purple-100 min-h-screen star-bg">
+
+  <!-- ヘッダー -->
+  <header class="text-center pt-10 pb-6 px-4 fade-up">
+    <p class="text-gold text-xl tracking-widest mb-3">✦ ✦ ✦</p>
+    <h1 class="text-2xl sm:text-3xl font-normal tracking-wider text-gold-light leading-tight mb-3">
+      無料スピリチュアル診断
+    </h1>
+    <p class="text-purple-300 text-sm leading-relaxed">
+      生年月日を入れるだけで<br>
+      <span class="text-gold font-bold">魂の設計図・転機の予兆・住む場所の波動</span>を<br>
+      AIが3,000文字以上で読み解きます
+    </p>
+  </header>
+
+  <!-- 実績バー -->
+  <div class="fade-up-2 mx-4 mb-6">
+    <div class="max-w-md mx-auto bg-white/5 border border-purple-500/30 rounded-full py-2 px-5 flex items-center justify-center gap-6 text-xs text-purple-300">
+      <span>⭐ 診断数 <b class="text-gold">8,247件</b></span>
+      <span class="text-purple-600">|</span>
+      <span>満足度 <b class="text-gold">96%</b></span>
+      <span class="text-purple-600">|</span>
+      <span>完全無料</span>
+    </div>
+  </div>
+
+  <!-- フォームカード -->
+  <main class="fade-up-3 px-4 pb-16 max-w-md mx-auto">
+    <form action="/diagnose" method="POST" id="diagnose-form">
+      <div class="bg-white/5 border border-purple-500/25 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
+
+        <!-- 生年月日 -->
+        <div class="mb-5">
+          <label class="block text-gold text-sm tracking-wider mb-2">
+            生年月日 <span class="text-red-400 text-xs">必須</span>
+          </label>
+          <input type="date" name="birth_date" required
+            class="w-full bg-white/8 border border-purple-500/40 rounded-xl text-purple-100 px-4 py-3 text-base focus:outline-none focus:border-gold transition-colors"
+            style="background:rgba(255,255,255,0.06);">
+        </div>
+
+        <!-- 性別 -->
+        <div class="mb-5">
+          <label class="block text-gold text-sm tracking-wider mb-2">
+            性別 <span class="text-red-400 text-xs">必須</span>
+          </label>
+          <div class="flex gap-3" id="gender-group">
+            <button type="button" class="gender-btn active flex-1 border border-purple-500/40 rounded-xl py-3 text-sm text-purple-300 transition-all" data-value="女性">女性</button>
+            <button type="button" class="gender-btn flex-1 border border-purple-500/40 rounded-xl py-3 text-sm text-purple-300 transition-all" data-value="男性">男性</button>
+            <button type="button" class="gender-btn flex-1 border border-purple-500/40 rounded-xl py-3 text-sm text-purple-300 transition-all" data-value="その他">その他</button>
+          </div>
+          <input type="hidden" name="gender" id="gender-input" value="女性">
+        </div>
+
+        <!-- 悩み -->
+        <div class="mb-5">
+          <label class="block text-gold text-sm tracking-wider mb-2">
+            今、一番深いお悩みを教えてください <span class="text-red-400 text-xs">必須</span>
+          </label>
+          <textarea name="concern" required minlength="15" rows="4"
+            placeholder="例：仕事を変えるべきか迷っています。今の職場は人間関係が辛くて、でも転職する勇気もなくて…"
+            class="w-full rounded-xl px-4 py-3 text-sm text-purple-100 placeholder-purple-600 border border-purple-500/40 focus:outline-none focus:border-gold transition-colors resize-none leading-relaxed"
+            style="background:rgba(255,255,255,0.06);"></textarea>
+        </div>
+
+        <!-- メール -->
+        <div class="mb-7">
+          <label class="block text-gold text-sm tracking-wider mb-2">
+            メールアドレス
+            <span class="text-purple-500 text-xs ml-1">（詳細鑑定の受け取りに使用）</span>
+          </label>
+          <input type="email" name="email" placeholder="example@gmail.com"
+            class="w-full rounded-xl px-4 py-3 text-base text-purple-100 placeholder-purple-600 border border-purple-500/40 focus:outline-none focus:border-gold transition-colors"
+            style="background:rgba(255,255,255,0.06);">
+        </div>
+
+        <!-- 送信ボタン -->
+        <button type="submit" id="submit-btn"
+          class="glow-btn w-full bg-gradient-to-r from-violet-700 to-purple-900 border border-purple-500/50 rounded-xl py-4 text-lg tracking-widest text-white font-normal transition-all hover:from-violet-600 hover:to-purple-800 active:scale-95">
+          ✦ &nbsp;今すぐ無料で診断する&nbsp; ✦
+        </button>
+
+        <p class="text-center text-purple-500 text-xs mt-4 leading-relaxed">
+          個人情報は診断・鑑定目的にのみ使用します<br>
+          クレジットカード不要・完全無料
+        </p>
+      </div>
+    </form>
+
+    <!-- レビュー -->
+    <div class="mt-6 space-y-3">
+      <div class="bg-white/5 border border-purple-500/20 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-purple-800 flex items-center justify-center text-sm flex-shrink-0">R</div>
+          <div>
+            <p class="text-yellow-400 text-xs mb-1">★★★★★</p>
+            <p class="text-purple-300 text-xs leading-relaxed">「なんでこんなに当たるんですか…3ヶ月以内の転機の話、本当にそのままでした」</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white/5 border border-purple-500/20 rounded-xl p-4">
+        <div class="flex items-start gap-3">
+          <div class="w-9 h-9 rounded-full bg-purple-800 flex items-center justify-center text-sm flex-shrink-0">M</div>
+          <div>
+            <p class="text-yellow-400 text-xs mb-1">★★★★★</p>
+            <p class="text-purple-300 text-xs leading-relaxed">「住む場所の話が刺さりすぎて泣きました。引越しの背中を押してくれた診断です」</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 性別選択
+    document.querySelectorAll('.gender-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('gender-input').value = btn.dataset.value;
+      });
+    });
+
+    // ローディング
+    document.getElementById('diagnose-form').addEventListener('submit', function(e) {
+      const btn = document.getElementById('submit-btn');
+      btn.textContent = '✦  鑑定書を生成中...  ✦';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    });
+  </script>
+</body>
+</html>

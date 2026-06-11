@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星詠み｜完全鑑定書 オンライン鑑定</title>
+  <style>
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c96a;
+      --purple-bg: #0d0020;
+      --purple-card: rgba(255,255,255,0.05);
+      --purple-border: rgba(180,120,255,0.25);
+      --text: #f0e4ff;
+      --text-sub: #b090d0;
+      --accent: #7c3aed;
+      --accent-hover: #6d28d9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Mincho ProN", "Yu Mincho", "ヒラギノ明朝 ProN", Georgia, serif;
+      background: var(--purple-bg);
+      background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(120,40,255,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(60,0,120,0.2) 0%, transparent 60%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.8;
+    }
+
+    /* ── ヘッダー ── */
+    header {
+      text-align: center;
+      padding: 70px 20px 50px;
+    }
+    .ornament { font-size: 1.6em; color: var(--gold); letter-spacing: 0.5em; margin-bottom: 18px; }
+    header h1 {
+      font-size: clamp(1.8em, 5vw, 2.8em);
+      font-weight: normal;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      margin-bottom: 14px;
+    }
+    header p {
+      color: var(--text-sub);
+      font-size: 1.0em;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 2.0;
+    }
+
+    /* ── セクション共通 ── */
+    section { padding: 60px 20px; max-width: 820px; margin: 0 auto; }
+    .section-title {
+      text-align: center;
+      color: var(--gold);
+      font-size: 1.2em;
+      letter-spacing: 0.15em;
+      margin-bottom: 36px;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid var(--purple-border);
+      margin: 0 auto;
+      max-width: 820px;
+    }
+
+    /* ── 特徴カード ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--purple-card);
+      border: 1px solid var(--purple-border);
+      border-radius: 14px;
+      padding: 28px 22px;
+      text-align: center;
+    }
+    .feature-icon { font-size: 2em; margin-bottom: 12px; }
+    .feature-card h3 { color: var(--gold); font-size: 0.95em; margin-bottom: 10px; font-weight: normal; }
+    .feature-card p { color: var(--text-sub); font-size: 0.88em; line-height: 1.9; }
+
+    /* ── プランカード ── */
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .plan-card {
+      background: var(--purple-card);
+      border: 1px solid var(--purple-border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .plan-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .plan-card.selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.08);
+      box-shadow: 0 0 30px rgba(201,168,76,0.12);
+    }
+    .plan-badge {
+      display: inline-block;
+      background: var(--gold);
+      color: #1a0533;
+      font-size: 0.72em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      letter-spacing: 0.05em;
+    }
+    .plan-card h3 { font-size: 1.15em; color: var(--text); margin-bottom: 6px; font-weight: normal; }
+    .plan-price {
+      font-size: 2.0em;
+      color: var(--gold);
+      margin: 10px 0;
+      letter-spacing: 0.05em;
+    }
+    .plan-price span { font-size: 0.5em; color: var(--text-sub); }
+    .plan-card ul {
+      list-style: none;
+      color: var(--text-sub);
+      font-size: 0.88em;
+      line-height: 2.1;
+    }
+    .plan-card ul li::before { content: "✦ "; color: var(--gold); }
+    .plan-radio { display: none; }
+
+    /* ── 申込フォーム ── */
+    .form-wrap {
+      background: var(--purple-card);
+      border: 1px solid var(--purple-border);
+      border-radius: 20px;
+      padding: 48px 44px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .form-group { margin-bottom: 24px; }
+    label {
+      display: block;
+      color: var(--gold);
+      font-size: 0.9em;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    label .req { color: #e05; font-size: 0.8em; margin-left: 4px; }
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select,
+    textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--purple-border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 13px 16px;
+      font-family: inherit;
+      font-size: 1.0em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--gold); }
+    select option { background: #1a0533; }
+    textarea { resize: vertical; min-height: 120px; line-height: 1.9; }
+
+    .radio-group {
+      display: flex;
+      gap: 14px;
+    }
+    .radio-item {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--purple-border);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      color: var(--text-sub);
+      font-size: 0.95em;
+      user-select: none;
+    }
+    .radio-item.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201,168,76,0.07);
+    }
+    .radio-item input { display: none; }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1.1em;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .note {
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.82em;
+      margin-top: 16px;
+      line-height: 2.0;
+    }
+
+    /* ── フッター ── */
+    footer {
+      text-align: center;
+      padding: 40px 20px 60px;
+      color: var(--text-sub);
+      font-size: 0.82em;
+      border-top: 1px solid var(--purple-border);
+    }
+
+    @media (max-width: 600px) {
+      .form-wrap { padding: 30px 22px; }
+      .plans { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header>
+  <div class="ornament">✦ ✦ ✦</div>
+  <h1>星詠み｜完全鑑定書</h1>
+  <p>
+    西洋占星術 × タロットの力で<br>
+    あなたの人生の本質と、今この瞬間に必要なメッセージを<br>
+    10,000文字で深く読み解きます。
+  </p>
+</header>
+<hr class="divider">
+
+<!-- 特徴 -->
+<section>
+  <p class="section-title">✦ 星詠みが選ばれる理由</p>
+  <div class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🌟</div>
+      <h3>1万文字超の圧倒的な深度</h3>
+      <p>一般的な占いの数十倍の情報量。読めば読むほど「私のことだ」と気づく。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔮</div>
+      <h3>悩みに正面から向き合う</h3>
+      <p>あなたの具体的な悩みを中心に、星とタロットが深く読み解きます。</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>注文後30分以内に納品</h3>
+      <p>申込後、自動でメール納品。待ち時間なしですぐ読めます。</p>
+    </div>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- プラン選択 -->
+<section id="plans">
+  <p class="section-title">✦ 鑑定プランを選ぶ</p>
+  <div class="plans" id="plan-cards">
+    <label class="plan-card selected" data-plan="standard" onclick="selectPlan(this)">
+      <div class="plan-badge">人気 No.1</div>
+      <h3>スタンダード鑑定</h3>
+      <div class="plan-price">¥4,980<span>（税込）</span></div>
+      <ul>
+        <li>10,000文字の完全鑑定書</li>
+        <li>6章構成・徹底的な深度</li>
+        <li>メールで即時納品（HTML）</li>
+        <li>恋愛・仕事・人生すべて網羅</li>
+      </ul>
+      <input class="plan-radio" type="radio" name="plan_select" value="standard" checked>
+    </label>
+    <label class="plan-card" data-plan="premium" onclick="selectPlan(this)">
+      <div class="plan-badge" style="background:#6d28d9;color:#fff;">プレミアム</div>
+      <h3>プレミアム鑑定</h3>
+      <div class="plan-price">¥9,800<span>（税込）</span></div>
+      <ul>
+        <li>スタンダードの全内容</li>
+        <li>美麗デザインPDFで納品</li>
+        <li>フォロー鑑定メッセージ付き</li>
+        <li>保存・印刷に最適</li>
+      </ul>
+      <input class="plan-radio" type="radio" name="plan_select" value="premium">
+    </label>
+  </div>
+</section>
+<hr class="divider">
+
+<!-- 申込フォーム -->
+<section id="order">
+  <p class="section-title">✦ 鑑定を申し込む</p>
+  <div class="form-wrap">
+    <form action="/order" method="POST" id="order-form">
+
+      <!-- プラン（hidden） -->
+      <input type="hidden" name="plan" id="plan-input" value="standard">
+
+      <div class="form-group">
+        <label>メールアドレス<span class="req">必須</span></label>
+        <input type="email" name="email" placeholder="example@gmail.com" required>
+      </div>
+
+      <div class="form-group">
+        <label>生年月日<span class="req">必須</span></label>
+        <input type="date" name="birth_date" required>
+      </div>
+
+      <div class="form-group">
+        <label>性別<span class="req">必須</span></label>
+        <div class="radio-group" id="gender-group">
+          <label class="radio-item active" onclick="selectGender(this, '女性')">
+            <input type="radio" name="gender" value="女性" checked>女性
+          </label>
+          <label class="radio-item" onclick="selectGender(this, '男性')">
+            <input type="radio" name="gender" value="男性">男性
+          </label>
+          <label class="radio-item" onclick="selectGender(this, 'その他')">
+            <input type="radio" name="gender" value="その他">その他
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>今、一番深いお悩みを教えてください<span class="req">必須</span></label>
+        <textarea name="concern" placeholder="例：2年付き合った彼とうまくいかなくなって、別れるべきか迷っています。彼は優しいのですが、最近すれ違いが増えて…" required minlength="20"></textarea>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        ✦ &nbsp;カード情報の入力へ進む&nbsp; ✦
+      </button>
+    </form>
+
+    <p class="note">
+      Stripe の安全な決済ページに移動します。<br>
+      決済完了後、30分以内にメールで鑑定書をお届けします。<br>
+      ご不明な点は DM でお気軽にどうぞ。
+    </p>
+  </div>
+</section>
+
+<footer>
+  © 星詠み師 月詠 &nbsp;|&nbsp; ご利用規約 &nbsp;|&nbsp; プライバシーポリシー
+</footer>
+
+<script>
+  function selectPlan(el) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('plan-input').value = el.dataset.plan;
+    el.querySelector('input[type=radio]').checked = true;
+  }
+
+  function selectGender(el, val) {
+    document.querySelectorAll('#gender-group .radio-item').forEach(r => r.classList.remove('active'));
+    el.classList.add('active');
+    el.querySelector('input[type=radio]').checked = true;
+  }
+</script>
+</body>
+</html>
