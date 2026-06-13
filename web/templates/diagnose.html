@@ -3,163 +3,538 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>無料スピリチュアル診断｜生年月日で魂の設計図を読む</title>
+  <title>魂の設計図診断｜星詠み</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Zen+Antique&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            mystic: { 50:'#f5eeff', 100:'#eddeff', 500:'#9b59b6', 700:'#6d28d9', 900:'#2d0b5c' },
-            gold: { DEFAULT:'#c9a84c', light:'#e8c96a' }
-          },
-          fontFamily: { serif: ['"Hiragino Mincho ProN"','"Yu Mincho"','Georgia','serif'] }
-        }
-      }
-    }
-  </script>
   <style>
-    body { background: radial-gradient(ellipse at 50% 0%, #3b0764 0%, #0d0020 60%); }
-    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8) sepia(1) hue-rotate(240deg); }
-    .star-bg { background-image: radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%), radial-gradient(1px 1px at 80% 10%, rgba(255,255,255,0.3) 0%, transparent 100%), radial-gradient(1px 1px at 60% 80%, rgba(255,255,255,0.25) 0%, transparent 100%); }
-    .gender-btn.active { background: rgba(201,168,76,0.15); border-color: #c9a84c; color: #c9a84c; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-    .fade-up { animation: fadeUp 0.7s ease forwards; }
-    .fade-up-2 { animation: fadeUp 0.7s 0.15s ease both; }
-    .fade-up-3 { animation: fadeUp 0.7s 0.3s ease both; }
-    .glow-btn { box-shadow: 0 0 30px rgba(124,58,237,0.5); }
-    .glow-btn:hover { box-shadow: 0 0 50px rgba(124,58,237,0.7); }
+    :root {
+      --gold-1: #8B6914;
+      --gold-2: #C9A84C;
+      --gold-3: #FFE08A;
+      --gold-grad: linear-gradient(135deg, #8B6914, #C9A84C, #FFE08A, #C9A84C, #8B6914);
+      --ink: #030308;
+      --ink-2: #0C0C18;
+      --ivory: #EDE0C4;
+      --ivory-dim: rgba(237,224,196,0.55);
+      --border-gold: rgba(201,168,76,0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'Noto Serif JP', serif;
+      background: var(--ink);
+      color: var(--ivory);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Starfield ── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: white;
+      animation: twinkle var(--dur, 3s) var(--delay, 0s) infinite ease-in-out;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.15; transform: scale(0.7); }
+      50% { opacity: 0.9; transform: scale(1.3); }
+    }
+    .nebula {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Loading Overlay ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+    #loading.active { display: flex; animation: fadeOverlay 0.5s ease; }
+    @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
+
+    .falling-star {
+      position: absolute;
+      width: 2px;
+      border-radius: 1px;
+      background: linear-gradient(to bottom, transparent, #C9A84C, transparent);
+      animation: fall var(--fdur, 3s) var(--fdelay, 0s) linear infinite;
+      opacity: 0;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-40px); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+
+    .orb-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.4);
+      animation: orb-spin 3s linear infinite;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .orb-ring::before {
+      content: '';
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.25);
+      animation: orb-spin 2s linear infinite reverse;
+    }
+    .orb-ring::after {
+      content: '✦';
+      font-size: 1.4rem;
+      background: var(--gold-grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200%;
+      animation: shimmer-text 2s linear infinite;
+    }
+    @keyframes orb-spin { to { transform: rotate(360deg); } }
+    @keyframes shimmer-text {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    #loading-msg {
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      color: rgba(201,168,76,0.8);
+      min-height: 1.5em;
+      text-align: center;
+    }
+
+    /* ── Main Content ── */
+    .content-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      text-align: center;
+      padding: 44px 0 0;
+    }
+    .moon-mark {
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      color: var(--gold-2);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      opacity: 0.8;
+    }
+    .site-title {
+      font-family: 'Zen Antique', serif;
+      font-size: 1.1rem;
+      background: var(--gold-grad);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer-text 4s linear infinite;
+      letter-spacing: 0.4em;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 52px 0 36px;
+      text-align: center;
+      animation: rise 0.9s ease both;
+    }
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: var(--gold-2);
+      margin-bottom: 18px;
+      opacity: 0.7;
+    }
+    .hero-title {
+      font-family: 'Zen Antique', serif;
+      font-size: clamp(1.75rem, 7vw, 2.4rem);
+      line-height: 1.55;
+      font-weight: 400;
+      color: var(--ivory);
+      margin-bottom: 22px;
+    }
+    .hero-title em {
+      font-style: normal;
+      background: var(--gold-grad);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer-text 3s linear infinite;
+    }
+    .hero-sub {
+      font-size: 0.82rem;
+      line-height: 2.0;
+      color: var(--ivory-dim);
+      letter-spacing: 0.04em;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Badges ── */
+    .badges {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+      animation: rise 0.9s 0.15s ease both;
+    }
+    .badge {
+      border: 1px solid var(--border-gold);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 0.72rem;
+      color: var(--gold-2);
+      letter-spacing: 0.05em;
+      background: rgba(201,168,76,0.05);
+    }
+    .badge strong { color: var(--gold-3); }
+
+    /* ── Form Card ── */
+    .form-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 32px 24px;
+      backdrop-filter: blur(10px);
+      animation: rise 0.9s 0.25s ease both;
+    }
+
+    .field-group { margin-bottom: 22px; }
+    .field-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--gold-2);
+      margin-bottom: 9px;
+      text-transform: uppercase;
+    }
+    .req { color: #E05; font-size: 0.7em; margin-left: 4px; }
+
+    .field-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 10px;
+      color: var(--ivory);
+      padding: 13px 16px;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+    .field-input:focus {
+      border-color: var(--gold-2);
+      background: rgba(201,168,76,0.05);
+    }
+    .field-input::placeholder { color: rgba(237,224,196,0.25); }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.7) sepia(1) hue-rotate(10deg) saturate(0.6);
+      opacity: 0.6;
+    }
+
+    .gender-row { display: flex; gap: 8px; }
+    .gender-btn {
+      flex: 1;
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 10px;
+      padding: 11px 8px;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.85rem;
+      color: rgba(237,224,196,0.45);
+      background: rgba(255,255,255,0.03);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .gender-btn.sel {
+      border-color: var(--gold-2);
+      color: var(--gold-2);
+      background: rgba(201,168,76,0.08);
+    }
+
+    textarea.field-input {
+      resize: none;
+      min-height: 110px;
+      line-height: 1.9;
+    }
+
+    /* ── Submit Button ── */
+    .submit-wrap { margin-top: 6px; }
+    .submit-btn {
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.0rem;
+      letter-spacing: 0.12em;
+      color: #0C0A00;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: var(--gold-grad);
+      background-size: 200%;
+      animation: shimmer-btn 3s linear infinite;
+      transition: opacity 0.2s, transform 0.1s;
+      font-weight: 500;
+    }
+    .submit-btn:active { transform: scale(0.98); opacity: 0.88; }
+    @keyframes shimmer-btn {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    .submit-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: rgba(237,224,196,0.3);
+      margin-top: 12px;
+      letter-spacing: 0.05em;
+      line-height: 1.8;
+    }
+
+    /* ── Divider ── */
+    .gold-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 36px 0;
+      opacity: 0.4;
+    }
+    .gold-divider::before, .gold-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-2));
+    }
+    .gold-divider::after { background: linear-gradient(to left, transparent, var(--gold-2)); }
+    .gold-divider span { color: var(--gold-2); font-size: 0.65rem; white-space: nowrap; letter-spacing: 0.2em; }
+
+    /* ── Reviews ── */
+    .review-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      animation: rise 0.9s 0.35s ease both;
+    }
+    .review-stars { color: #C9A84C; font-size: 0.7rem; margin-bottom: 8px; letter-spacing: 0.1em; }
+    .review-text { font-size: 0.82rem; color: var(--ivory-dim); line-height: 1.9; }
+    .review-name { font-size: 0.7rem; color: rgba(201,168,76,0.5); margin-top: 8px; letter-spacing: 0.1em; }
   </style>
 </head>
-<body class="font-serif text-purple-100 min-h-screen star-bg">
+<body>
 
-  <!-- ヘッダー -->
-  <header class="text-center pt-10 pb-6 px-4 fade-up">
-    <p class="text-gold text-xl tracking-widest mb-3">✦ ✦ ✦</p>
-    <h1 class="text-2xl sm:text-3xl font-normal tracking-wider text-gold-light leading-tight mb-3">
-      無料スピリチュアル診断
-    </h1>
-    <p class="text-purple-300 text-sm leading-relaxed">
-      生年月日を入れるだけで<br>
-      <span class="text-gold font-bold">魂の設計図・転機の予兆・住む場所の波動</span>を<br>
-      AIが3,000文字以上で読み解きます
-    </p>
+<!-- Starfield -->
+<div id="starfield"></div>
+<div class="nebula" style="width:400px;height:400px;top:-100px;right:-100px;background:radial-gradient(circle,rgba(60,10,120,0.35),transparent)"></div>
+<div class="nebula" style="width:300px;height:300px;bottom:100px;left:-80px;background:radial-gradient(circle,rgba(10,30,80,0.3),transparent)"></div>
+
+<!-- Loading Overlay -->
+<div id="loading">
+  <div id="loading-stars-container" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
+  <div class="orb-ring"></div>
+  <p id="loading-msg">宇宙の記録を解析中...</p>
+  <p style="font-size:0.68rem;color:rgba(201,168,76,0.35);letter-spacing:0.15em;">しばらくお待ちください（30〜60秒）</p>
+</div>
+
+<!-- Content -->
+<div class="content-wrap">
+
+  <!-- Header -->
+  <header class="site-header">
+    <p class="moon-mark">☽ &nbsp;Spiritual Diagnosis&nbsp; ☾</p>
+    <h1 class="site-title">星　詠　み</h1>
   </header>
 
-  <!-- 実績バー -->
-  <div class="fade-up-2 mx-4 mb-6">
-    <div class="max-w-md mx-auto bg-white/5 border border-purple-500/30 rounded-full py-2 px-5 flex items-center justify-center gap-6 text-xs text-purple-300">
-      <span>⭐ 診断数 <b class="text-gold">8,247件</b></span>
-      <span class="text-purple-600">|</span>
-      <span>満足度 <b class="text-gold">96%</b></span>
-      <span class="text-purple-600">|</span>
-      <span>完全無料</span>
-    </div>
+  <!-- Hero -->
+  <section class="hero">
+    <p class="hero-eyebrow">― 生年月日で読み解く ―</p>
+    <h2 class="hero-title">
+      あなたの<em>魂の設計図</em>、<br>読みます。
+    </h2>
+    <p class="hero-sub">
+      今の停滞の原因・3ヶ月以内の転機の予兆<br>
+      住むべき場所の波動まで<br>
+      AIが3,000文字以上で読み解く
+    </p>
+  </section>
+
+  <!-- Badges -->
+  <div class="badges">
+    <span class="badge">診断数 <strong>8,247件</strong></span>
+    <span class="badge">満足度 <strong>96%</strong></span>
+    <span class="badge">完全無料</span>
   </div>
 
-  <!-- フォームカード -->
-  <main class="fade-up-3 px-4 pb-16 max-w-md mx-auto">
-    <form action="/diagnose" method="POST" id="diagnose-form">
-      <div class="bg-white/5 border border-purple-500/25 rounded-2xl p-6 sm:p-8 backdrop-blur-sm">
+  <!-- Form -->
+  <div class="form-card">
+    <form action="/diagnose" method="POST" id="diag-form">
+      <input type="hidden" name="gender" id="gender-input" value="女性">
 
-        <!-- 生年月日 -->
-        <div class="mb-5">
-          <label class="block text-gold text-sm tracking-wider mb-2">
-            生年月日 <span class="text-red-400 text-xs">必須</span>
-          </label>
-          <input type="date" name="birth_date" required
-            class="w-full bg-white/8 border border-purple-500/40 rounded-xl text-purple-100 px-4 py-3 text-base focus:outline-none focus:border-gold transition-colors"
-            style="background:rgba(255,255,255,0.06);">
+      <div class="field-group">
+        <label class="field-label">生年月日<span class="req">*</span></label>
+        <input type="date" name="birth_date" class="field-input" required>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">性別<span class="req">*</span></label>
+        <div class="gender-row" id="gender-row">
+          <button type="button" class="gender-btn sel" data-v="女性">女性</button>
+          <button type="button" class="gender-btn" data-v="男性">男性</button>
+          <button type="button" class="gender-btn" data-v="その他">その他</button>
         </div>
+      </div>
 
-        <!-- 性別 -->
-        <div class="mb-5">
-          <label class="block text-gold text-sm tracking-wider mb-2">
-            性別 <span class="text-red-400 text-xs">必須</span>
-          </label>
-          <div class="flex gap-3" id="gender-group">
-            <button type="button" class="gender-btn active flex-1 border border-purple-500/40 rounded-xl py-3 text-sm text-purple-300 transition-all" data-value="女性">女性</button>
-            <button type="button" class="gender-btn flex-1 border border-purple-500/40 rounded-xl py-3 text-sm text-purple-300 transition-all" data-value="男性">男性</button>
-            <button type="button" class="gender-btn flex-1 border border-purple-500/40 rounded-xl py-3 text-sm text-purple-300 transition-all" data-value="その他">その他</button>
-          </div>
-          <input type="hidden" name="gender" id="gender-input" value="女性">
-        </div>
+      <div class="field-group">
+        <label class="field-label">今一番深いお悩みを<span class="req">*</span></label>
+        <textarea name="concern" class="field-input" rows="4" required minlength="15"
+          placeholder="例：仕事を変えるべきか迷っています。今の職場は人間関係が辛くて、でも転職する勇気もなくて…"></textarea>
+      </div>
 
-        <!-- 悩み -->
-        <div class="mb-5">
-          <label class="block text-gold text-sm tracking-wider mb-2">
-            今、一番深いお悩みを教えてください <span class="text-red-400 text-xs">必須</span>
-          </label>
-          <textarea name="concern" required minlength="15" rows="4"
-            placeholder="例：仕事を変えるべきか迷っています。今の職場は人間関係が辛くて、でも転職する勇気もなくて…"
-            class="w-full rounded-xl px-4 py-3 text-sm text-purple-100 placeholder-purple-600 border border-purple-500/40 focus:outline-none focus:border-gold transition-colors resize-none leading-relaxed"
-            style="background:rgba(255,255,255,0.06);"></textarea>
-        </div>
+      <div class="field-group">
+        <label class="field-label">メールアドレス<span style="color:rgba(201,168,76,0.4);font-size:0.65em;margin-left:6px;">詳細鑑定の受け取りに使用</span></label>
+        <input type="email" name="email" class="field-input" placeholder="example@gmail.com">
+      </div>
 
-        <!-- メール -->
-        <div class="mb-7">
-          <label class="block text-gold text-sm tracking-wider mb-2">
-            メールアドレス
-            <span class="text-purple-500 text-xs ml-1">（詳細鑑定の受け取りに使用）</span>
-          </label>
-          <input type="email" name="email" placeholder="example@gmail.com"
-            class="w-full rounded-xl px-4 py-3 text-base text-purple-100 placeholder-purple-600 border border-purple-500/40 focus:outline-none focus:border-gold transition-colors"
-            style="background:rgba(255,255,255,0.06);">
-        </div>
-
-        <!-- 送信ボタン -->
-        <button type="submit" id="submit-btn"
-          class="glow-btn w-full bg-gradient-to-r from-violet-700 to-purple-900 border border-purple-500/50 rounded-xl py-4 text-lg tracking-widest text-white font-normal transition-all hover:from-violet-600 hover:to-purple-800 active:scale-95">
-          ✦ &nbsp;今すぐ無料で診断する&nbsp; ✦
+      <div class="submit-wrap">
+        <button type="submit" class="submit-btn" id="submit-btn">
+          今すぐ無料で診断する &nbsp;→
         </button>
-
-        <p class="text-center text-purple-500 text-xs mt-4 leading-relaxed">
-          個人情報は診断・鑑定目的にのみ使用します<br>
-          クレジットカード不要・完全無料
+        <p class="submit-note">
+          クレジットカード不要・完全無料<br>
+          個人情報は鑑定目的にのみ使用します
         </p>
       </div>
     </form>
+  </div>
 
-    <!-- レビュー -->
-    <div class="mt-6 space-y-3">
-      <div class="bg-white/5 border border-purple-500/20 rounded-xl p-4">
-        <div class="flex items-start gap-3">
-          <div class="w-9 h-9 rounded-full bg-purple-800 flex items-center justify-center text-sm flex-shrink-0">R</div>
-          <div>
-            <p class="text-yellow-400 text-xs mb-1">★★★★★</p>
-            <p class="text-purple-300 text-xs leading-relaxed">「なんでこんなに当たるんですか…3ヶ月以内の転機の話、本当にそのままでした」</p>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white/5 border border-purple-500/20 rounded-xl p-4">
-        <div class="flex items-start gap-3">
-          <div class="w-9 h-9 rounded-full bg-purple-800 flex items-center justify-center text-sm flex-shrink-0">M</div>
-          <div>
-            <p class="text-yellow-400 text-xs mb-1">★★★★★</p>
-            <p class="text-purple-300 text-xs leading-relaxed">「住む場所の話が刺さりすぎて泣きました。引越しの背中を押してくれた診断です」</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
+  <div class="gold-divider"><span>✦ 利用者の声 ✦</span></div>
 
-  <script>
-    // 性別選択
-    document.querySelectorAll('.gender-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('gender-input').value = btn.dataset.value;
-      });
+  <!-- Reviews -->
+  <div class="review-card">
+    <div class="review-stars">★★★★★</div>
+    <p class="review-text">「3ヶ月以内の転機の話、本当にそのままでした。読んでいて何度も涙が出ました。こんなに当たるものなんですね。」</p>
+    <p class="review-name">— R.N. 28歳・会社員</p>
+  </div>
+  <div class="review-card">
+    <div class="review-stars">★★★★★</div>
+    <p class="review-text">「住む場所の話が刺さりすぎて鳥肌立ちました。ずっと感じていた『ここじゃない感』の正体がわかった気がします。」</p>
+    <p class="review-name">— M.T. 31歳・フリーランス</p>
+  </div>
+
+</div><!-- /content-wrap -->
+
+<script>
+  // ── Starfield ──
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 160; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2.2 + 0.4;
+    s.style.cssText = `
+      left:${Math.random()*100}%;
+      top:${Math.random()*100}%;
+      width:${sz}px; height:${sz}px;
+      --dur:${(Math.random()*4+2).toFixed(1)}s;
+      --delay:${(Math.random()*6).toFixed(1)}s;
+      opacity:0.15;
+    `;
+    sf.appendChild(s);
+  }
+
+  // ── Gender buttons ──
+  document.querySelectorAll('.gender-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      document.getElementById('gender-input').value = btn.dataset.v;
     });
+  });
 
-    // ローディング
-    document.getElementById('diagnose-form').addEventListener('submit', function(e) {
-      const btn = document.getElementById('submit-btn');
-      btn.textContent = '✦  鑑定書を生成中...  ✦';
-      btn.disabled = true;
-      btn.style.opacity = '0.7';
-    });
-  </script>
+  // ── Loading overlay ──
+  const messages = [
+    '宇宙の記録を解析中...',
+    '星の配置を確認しています...',
+    '魂の設計図を読み解いています...',
+    'あなただけのメッセージを紡いでいます...',
+  ];
+
+  function typeMsg(text, el, cb) {
+    el.textContent = '';
+    let i = 0;
+    const t = setInterval(() => {
+      el.textContent += text[i++];
+      if (i >= text.length) { clearInterval(t); if (cb) setTimeout(cb, 1600); }
+    }, 60);
+  }
+
+  function cycleMessages(idx) {
+    const el = document.getElementById('loading-msg');
+    typeMsg(messages[idx % messages.length], el, () => cycleMessages(idx + 1));
+  }
+
+  function spawnFallingStars() {
+    const cont = document.getElementById('loading-stars-container');
+    for (let i = 0; i < 55; i++) {
+      const fs = document.createElement('div');
+      fs.className = 'falling-star';
+      const h = Math.random() * 60 + 30;
+      fs.style.cssText = `
+        left:${Math.random()*100}%;
+        top:${-h}px;
+        height:${h}px;
+        --fdur:${(Math.random()*4+3).toFixed(1)}s;
+        --fdelay:${(Math.random()*6).toFixed(1)}s;
+      `;
+      cont.appendChild(fs);
+    }
+  }
+
+  document.getElementById('diag-form').addEventListener('submit', function() {
+    const ov = document.getElementById('loading');
+    ov.classList.add('active');
+    spawnFallingStars();
+    cycleMessages(0);
+  });
+</script>
 </body>
 </html>

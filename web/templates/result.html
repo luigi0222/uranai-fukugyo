@@ -3,131 +3,389 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>あなたの診断結果｜星詠みスピリチュアル診断</title>
+  <title>あなたの鑑定結果｜星詠み</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Zen+Antique&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            gold: { DEFAULT:'#c9a84c', light:'#e8c96a' }
-          },
-          fontFamily: { serif: ['"Hiragino Mincho ProN"','"Yu Mincho"','Georgia','serif'] }
-        }
-      }
-    }
-  </script>
   <style>
-    body { background: radial-gradient(ellipse at 50% 0%, #2d0b5c 0%, #0d0020 55%); }
-
-    .content-body {
-      white-space: pre-wrap;
-      word-break: break-all;
-      line-height: 2.1;
-      font-size: 0.97rem;
+    :root {
+      --gold-1: #8B6914;
+      --gold-2: #C9A84C;
+      --gold-3: #FFE08A;
+      --gold-grad: linear-gradient(135deg, #8B6914, #C9A84C, #FFE08A, #C9A84C, #8B6914);
+      --ink: #030308;
+      --ivory: #EDE0C4;
+      --ivory-dim: rgba(237,224,196,0.6);
+      --border-gold: rgba(201,168,76,0.22);
     }
-    .content-body h2, .content-body .chapter {
-      color: #c9a84c;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'Noto Serif JP', serif;
+      background: var(--ink);
+      color: var(--ivory);
+      min-height: 100vh;
+    }
+
+    #starfield {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .star {
+      position: absolute; border-radius: 50%; background: white;
+      animation: twinkle var(--dur,3s) var(--delay,0s) infinite ease-in-out;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: 0.1; transform: scale(0.7); }
+      50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    .nebula {
+      position: fixed; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; z-index: 0;
+    }
+
+    @keyframes shimmer-text {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 600px; margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+      animation: rise 0.7s ease both;
+    }
+    .site-label {
+      font-family: 'Zen Antique', serif;
+      font-size: 0.85rem;
+      background: var(--gold-grad);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer-text 4s linear infinite;
+      letter-spacing: 0.5em;
+      margin-bottom: 12px;
+    }
+    .result-title {
+      font-family: 'Zen Antique', serif;
+      font-size: 1.3rem;
+      color: var(--ivory);
+      letter-spacing: 0.2em;
+      font-weight: 400;
+    }
+
+    /* ── Meta bar ── */
+    .meta-bar {
+      display: flex;
+      gap: 0;
+      justify-content: center;
+      margin-bottom: 32px;
+      border: 1px solid var(--border-gold);
+      border-radius: 100px;
+      overflow: hidden;
+      animation: rise 0.7s 0.1s ease both;
+    }
+    .meta-item {
+      flex: 1;
+      text-align: center;
+      padding: 9px 10px;
+      font-size: 0.72rem;
+      color: var(--ivory-dim);
+      letter-spacing: 0.05em;
+      border-right: 1px solid var(--border-gold);
+    }
+    .meta-item:last-child { border-right: none; }
+    .meta-item strong { display: block; color: var(--gold-2); font-size: 0.78rem; margin-bottom: 2px; }
+
+    /* ── Content ── */
+    .content-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      padding: 36px 28px;
+      margin-bottom: 28px;
+      animation: rise 0.7s 0.2s ease both;
+    }
+
+    /* JS でフォーマットされる章見出し */
+    .chapter-heading {
+      font-family: 'Zen Antique', serif;
+      font-size: 0.95rem;
+      background: var(--gold-grad);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer-text 5s linear infinite;
+      letter-spacing: 0.1em;
+      margin: 32px 0 14px;
+      padding-left: 12px;
+      border-left: 2px solid var(--gold-2);
+      display: block;
+    }
+    .chapter-heading:first-child { margin-top: 0; }
+
+    .content-para {
+      font-size: 0.9rem;
+      line-height: 2.15;
+      color: var(--ivory-dim);
+      margin-bottom: 1em;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Paywall ── */
+    .paywall-section {
+      animation: rise 0.7s 0.3s ease both;
+    }
+    .section-sep {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-sep::before, .section-sep::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(201,168,76,0.35));
+    }
+    .section-sep::after { background: linear-gradient(to left, transparent, rgba(201,168,76,0.35)); }
+    .section-sep span {
+      color: var(--gold-2); font-size: 0.68rem;
+      letter-spacing: 0.2em; white-space: nowrap;
+    }
+
+    .paywall-card {
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      background: rgba(255,255,255,0.025);
+    }
+
+    .paywall-preview {
+      padding: 28px 24px 0;
+    }
+    .preview-chapter {
+      font-size: 0.82rem;
+      color: var(--gold-2);
+      letter-spacing: 0.12em;
+      margin-bottom: 10px;
+    }
+    .preview-text {
+      font-size: 0.85rem;
+      line-height: 2.0;
+      color: rgba(237,224,196,0.35);
+      filter: blur(5px);
+      user-select: none;
+      pointer-events: none;
+      padding-bottom: 20px;
+    }
+
+    .paywall-gate {
+      background: linear-gradient(to bottom, transparent 0%, rgba(3,3,8,0.75) 25%, rgba(3,3,8,0.97) 55%);
+      padding: 60px 24px 32px;
+      text-align: center;
+      margin-top: -60px;
+      position: relative;
+    }
+
+    .lock-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+      display: block;
+      animation: lock-pulse 2.5s ease-in-out infinite;
+    }
+    @keyframes lock-pulse {
+      0%,100% { opacity: 0.7; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    .paywall-title {
+      font-family: 'Zen Antique', serif;
       font-size: 1.05rem;
-      margin-top: 2rem;
-      margin-bottom: 0.8rem;
-      padding-left: 10px;
-      border-left: 3px solid #7c3aed;
+      color: var(--ivory);
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .paywall-desc {
+      font-size: 0.78rem;
+      color: var(--ivory-dim);
+      line-height: 2.0;
+      margin-bottom: 24px;
+    }
+    .paywall-desc strong { color: var(--gold-2); }
+
+    .cta-btn {
+      display: block;
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: #0C0A00;
+      cursor: pointer;
+      background: var(--gold-grad);
+      background-size: 200%;
+      animation: shimmer-btn 3s linear infinite;
+      transition: transform 0.1s, opacity 0.15s;
+      box-shadow: 0 4px 30px rgba(201,168,76,0.3);
+    }
+    .cta-btn:active { transform: scale(0.98); opacity: 0.9; }
+    @keyframes shimmer-btn {
+      0% { background-position: 0% center; }
+      100% { background-position: 200% center; }
     }
 
-    /* ペイウォール */
-    .paywall-blur { filter: blur(7px); user-select: none; pointer-events: none; line-height: 2.1; font-size: 0.95rem; color: #d4b8f0; }
-    .paywall-wrap { position: relative; border-radius: 16px; overflow: hidden; }
-    .paywall-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(to bottom, rgba(13,0,32,0) 0%, rgba(13,0,32,0.6) 20%, rgba(13,0,32,0.92) 55%);
-      display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-      padding-bottom: 28px; padding-left: 16px; padding-right: 16px;
+    .cta-note {
+      font-size: 0.68rem;
+      color: rgba(237,224,196,0.3);
+      margin-top: 10px;
+      letter-spacing: 0.06em;
+      line-height: 1.9;
     }
 
-    .glow-cta { box-shadow: 0 0 40px rgba(201,168,76,0.4); }
-    .glow-cta:hover { box-shadow: 0 0 60px rgba(201,168,76,0.6); transform: translateY(-2px); }
-
-    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    .fade-in { animation: fadeIn 0.6s ease; }
-
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-    .pulse { animation: pulse 2s infinite; }
+    /* ── Share ── */
+    .share-section {
+      text-align: center;
+      margin-top: 40px;
+      animation: rise 0.7s 0.4s ease both;
+    }
+    .share-label { font-size: 0.7rem; color: rgba(201,168,76,0.4); letter-spacing: 0.15em; margin-bottom: 12px; }
+    .share-btn {
+      display: inline-block;
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 100px;
+      padding: 8px 22px;
+      font-size: 0.75rem;
+      color: rgba(237,224,196,0.45);
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .share-btn:hover { border-color: var(--gold-2); color: var(--gold-2); }
   </style>
 </head>
-<body class="font-serif text-purple-100 min-h-screen">
-<div class="max-w-xl mx-auto px-4 py-10 fade-in">
+<body>
 
-  <!-- ヘッダー -->
-  <div class="text-center mb-8">
-    <p class="text-gold text-xl tracking-widest mb-3 pulse">✦ ✦ ✦</p>
-    <h1 class="text-xl tracking-wider text-gold-light font-normal">あなたの診断結果</h1>
-    <p class="text-purple-400 text-xs mt-2">
-      {{ birth_str }} / {{ zodiac }} / ライフパス {{ life_path }}
-    </p>
+<div id="starfield"></div>
+<div class="nebula" style="width:350px;height:350px;top:-80px;right:-80px;background:radial-gradient(circle,rgba(60,10,100,0.3),transparent)"></div>
+<div class="nebula" style="width:280px;height:280px;bottom:200px;left:-60px;background:radial-gradient(circle,rgba(10,25,70,0.25),transparent)"></div>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <header class="page-header">
+    <p class="site-label">星　詠　み</p>
+    <h1 class="result-title">鑑定結果</h1>
+  </header>
+
+  <!-- Meta -->
+  <div class="meta-bar">
+    <div class="meta-item"><strong>{{ zodiac }}</strong>太陽星座</div>
+    <div class="meta-item"><strong>{{ life_path }}</strong>ライフパス</div>
+    <div class="meta-item"><strong>{{ birth_str }}</strong>生年月日</div>
   </div>
 
-  <!-- 無料コンテンツ -->
-  <div class="bg-white/5 border border-purple-500/25 rounded-2xl p-6 mb-6">
-    <div class="content-body text-purple-100">{{ content }}</div>
+  <!-- Free Content -->
+  <div class="content-card">
+    <div id="content-body"></div>
   </div>
 
-  <!-- ── ペイウォール ───────────────────────── -->
-  <div class="mb-4">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
-      <span class="text-gold text-xs tracking-widest whitespace-nowrap">🔒 有料コンテンツ</span>
-      <div class="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
-    </div>
+  <!-- Paywall -->
+  <div class="paywall-section">
+    <div class="section-sep"><span>🔒 &nbsp;有料コンテンツ&nbsp; 🔒</span></div>
 
-    <div class="paywall-wrap bg-white/5 border border-gold/30 rounded-2xl p-6">
-      <!-- ぼかしコンテンツ（プレビュー） -->
-      <div class="paywall-blur mb-4">
-        <p class="text-gold text-sm mb-3">【第4章】あなたが住むべき場所の条件</p>
-        <p>あなたの魂が最も輝ける土地には、ある共通した特徴があります。それは単なる利便性や家賃の問題ではなく、地の気・水の流れ・人々のエネルギーが複雑に絡み合った「波動の地図」によって決まります。あなたの場合、生まれ持った星座エネルギーと数秘の組み合わせから判断すると、最も相性が良い土地の条件は……</p>
-        <p class="text-gold text-sm mt-5 mb-3">【第5章】あなたのスピリチュアル覚醒時期</p>
-        <p>スピリチュアルな目覚めは、誰にでも必ず訪れます。しかしその「タイミング」は人によって大きく異なり、生年月日に刻まれた宇宙のプログラムによって事前に決まっています。あなたの場合、具体的な覚醒の兆しが現れ始めるのは……その時期に向けて今すぐ準備す</p>
+    <div class="paywall-card">
+      <div class="paywall-preview">
+        <p class="preview-chapter">【第4章】あなたが住むべき場所の条件</p>
+        <p class="preview-text">あなたの魂が最も輝ける土地には、ある共通した特徴があります。それは単なる利便性や家賃の問題ではなく、地の気・水の流れ・人々のエネルギーが複雑に絡み合った「波動の地図」によって決まります。あなたの生まれ持った星座エネルギーと数秘の組み合わせから判断すると、最も相性の良い土地の条件は……</p>
+        <p class="preview-chapter" style="margin-top:12px;">【第5章】スピリチュアル覚醒の具体的な時期</p>
+        <p class="preview-text">スピリチュアルな目覚めは、誰にでも必ず訪れます。しかしその「タイミング」は人によって大きく異なり、生年月日に刻まれた宇宙のプログラムによって事前に決まっています。あなたの場合、具体的な覚醒の兆しが現れ始めるのは……その時期に向けて今すぐ準備す</p>
       </div>
 
-      <!-- オーバーレイ -->
-      <div class="paywall-overlay">
-        <div class="text-center">
-          <div class="text-3xl mb-3">🔓</div>
-          <p class="text-gold text-base font-bold tracking-wide mb-1">残り2章を解放する</p>
-          <p class="text-purple-300 text-xs mb-5 leading-relaxed">
-            「住むべき場所の条件」と<br>
-            「スピリチュアル覚醒の具体的な時期」を今すぐ確認
-          </p>
+      <div class="paywall-gate">
+        <span class="lock-icon">🔓</span>
+        <h2 class="paywall-title">残り2章を解放する</h2>
+        <p class="paywall-desc">
+          <strong>「住むべき場所の条件」</strong>と<br>
+          <strong>「スピリチュアル覚醒の具体的な時期」</strong><br>
+          を今すぐ確認できます
+        </p>
 
-          <form action="/order-diagnose" method="POST">
-            <input type="hidden" name="birth_date" value="{{ birth_date_raw }}">
-            <input type="hidden" name="gender" value="{{ gender }}">
-            <input type="hidden" name="concern" value="{{ concern }}">
-            <input type="hidden" name="email" value="{{ email }}">
-            <button type="submit"
-              class="glow-cta w-full bg-gradient-to-r from-yellow-600 to-amber-500 rounded-xl py-4 px-6 text-white text-base tracking-wider transition-all active:scale-95">
-              ✦ &nbsp;¥1,200 で今すぐ解放する&nbsp; ✦
-            </button>
-          </form>
-
-          <p class="text-purple-500 text-xs mt-3 leading-relaxed">
-            安全なStripe決済・30分以内にメール納品
-          </p>
-        </div>
+        <form action="/order-diagnose" method="POST">
+          <input type="hidden" name="birth_date" value="{{ birth_date_raw }}">
+          <input type="hidden" name="gender"     value="{{ gender }}">
+          <input type="hidden" name="concern"    value="{{ concern }}">
+          <input type="hidden" name="email"      value="{{ email }}">
+          <button type="submit" class="cta-btn">
+            ¥ 1,200 で今すぐ解放する &nbsp;→
+          </button>
+        </form>
+        <p class="cta-note">
+          Stripe 安全決済 &nbsp;|&nbsp; 30分以内にメール納品
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- SNSシェア（バイラル設計） -->
-  <div class="text-center mt-8">
-    <p class="text-purple-400 text-xs mb-3">この診断を友達にシェアする</p>
-    <a href="https://twitter.com/intent/tweet?text=無料スピリチュアル診断が当たりすぎて鳥肌立った…生年月日だけでここまで分かるの怖い%0A→ {{ request.host_url }}diagnose"
-       target="_blank"
-       class="inline-block border border-purple-500/40 rounded-xl px-5 py-2 text-purple-300 text-sm hover:border-gold hover:text-gold transition-colors">
-      X（Twitter）でシェア
-    </a>
+  <!-- Share -->
+  <div class="share-section">
+    <p class="share-label">― この診断をシェアする ―</p>
+    <a href="javascript:void(0)" onclick="shareResult()" class="share-btn">X（Twitter）でシェア</a>
   </div>
 
-</div>
+</div><!-- /wrap -->
+
+<script>
+  // ── Starfield ──
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 0.5;
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--dur:${(Math.random()*4+2).toFixed(1)}s;--delay:${(Math.random()*6).toFixed(1)}s;`;
+    sf.appendChild(s);
+  }
+
+  // ── Format content ──
+  const rawContent = {{ content | tojson }};
+  const container  = document.getElementById('content-body');
+
+  rawContent.split('\n').forEach(line => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    if (/^【第[1-9一二三四五六]章】/.test(trimmed) || /^【第\d+章】/.test(trimmed)) {
+      const h = document.createElement('span');
+      h.className = 'chapter-heading';
+      h.textContent = trimmed;
+      container.appendChild(h);
+    } else {
+      const p = document.createElement('p');
+      p.className = 'content-para';
+      p.textContent = trimmed;
+      container.appendChild(p);
+    }
+  });
+
+  // ── Share ──
+  function shareResult() {
+    const text = encodeURIComponent('無料スピリチュアル診断が当たりすぎて鳥肌立った…生年月日だけでここまで読まれるの怖い');
+    const url  = encodeURIComponent('{{ request.host_url }}diagnose');
+    window.open('https://twitter.com/intent/tweet?text=' + text + '%0A→%20' + url, '_blank');
+  }
+</script>
 </body>
 </html>
